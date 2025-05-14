@@ -41,35 +41,6 @@ Python から JavaScript (Node.js) への切り替えにより、同様の開発
 
    必要に応じて、API 通信用ライブラリも追加可能 (axios など)
 
-5. `.env` ファイルを作成し、以下を記述:
-
-   ```env
-   DISCORD_TOKEN=set_your_bot_token
-   GEMINI_API_KEY=set_your_api_key
-   ```
-
-6. `index.js` (または main ファイル) を作成し、以下のように基本的なボット構成を記述:
-
-   ```js
-   const { Client, GatewayIntentBits } = require('discord.js');
-   const dotenv = require('dotenv');
-   dotenv.config();
-
-   const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
-
-   client.once('ready', () => {
-     console.log(`Logged in as ${client.user.tag}!`);
-   });
-
-   client.on('messageCreate', message => {
-     if (!message.author.bot && message.content === '!ping') {
-       message.channel.send('Pong!');
-     }
-   });
-
-   client.login(process.env.DISCORD_TOKEN);
-   ```
-
 7. ボットを実行:
 
    ```bash
