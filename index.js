@@ -1,37 +1,30 @@
-// ==========================
-// Discord Bot メインスクリプト
-// ==========================
-
-// --- 必要なライブラリの読み込み ---
-// discord.js: Discord Botのための主要ライブラリ
+// discord.jsライブラリから必要なクラス・定数を読み込む
 const { Client, GatewayIntentBits } = require("discord.js");
 
-// dotenv: .envファイルから環境変数を読み込むためのライブラリ
+// 環境変数を使用するためのdotenvを読み込み
 const dotenv = require("dotenv");
 dotenv.config(); // .envファイルを読み込んでprocess.envに設定
 
-// axios: HTTPリクエストを送信するためのライブラリ
+// HTTPリクエストを送るためのaxiosを読み込み
 const axios = require("axios");
 
-// --- Discordクライアントの初期化 ---
-// Botが受け取るイベントの種類（Intent）を指定
+// Discordクライアントの初期化
 const client = new Client({
   intents: [
-    GatewayIntentBits.Guilds,         // サーバー（ギルド）関連のイベント
-    GatewayIntentBits.GuildMessages,  // メッセージ関連のイベント
-    GatewayIntentBits.MessageContent, // メッセージ内容の取得（Intent必須）
+    GatewayIntentBits.Guilds,           // サーバー（ギルド）関連のイベントを受け取る
+    GatewayIntentBits.GuildMessages,    // メッセージ関連のイベントを受け取る
+    GatewayIntentBits.MessageContent,   // メッセージの中身（内容）を取得する（必要なIntent）
   ],
 });
 
-// --- Gemini APIの設定 ---
-// .envファイルからGemini APIキーを取得
+// ===== Gemini APIの設定 =====
+// 環境変数からAPIキーを取得（.envファイルに設定しておく）
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Gemini APIのエンドポイントURLを組み立て
+// Gemini APIのエンドポイントURLを設定（APIキー付き）
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
-// --- Gemini APIとの通信関数 ---
-// ユーザーからのプロンプトを受け取り、Gemini APIで返答を生成
+// ===== Geminiとの通信関数 =====
 async function generateReply(prompt) {
   try {
     // Gemini APIへPOSTリクエストを送信
@@ -40,62 +33,62 @@ async function generateReply(prompt) {
       {
         contents: [
           {
-            parts: [{ text: prompt }], // ユーザーの入力をAPIに渡す
+            parts: [{ text: prompt }], // ユーザーからのプロンプトを渡す
           },
         ],
       },
       {
         headers: {
-          "Content-Type": "application/json", // リクエスト形式をJSONに指定
+          "Content-Type": "application/json", // JSONとして送信することを指定
         },
       }
     );
 
-    // Gemini APIの返答からテキスト部分を安全に抽出
+    // Geminiの返答からテキスト部分を安全に抽出
     const reply = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    // 返答が空の場合はデフォルトメッセージを返す
+    // 返答が空ならメッセージを表示
     return reply || "（Geminiからの返答が空です）";
   } catch (error) {
-    // エラー発生時は詳細をログに出力し、ユーザーにも通知
+    // エラー時のログとユーザーへのメッセージ
     console.error("Gemini APIエラー:", error.response?.data || error.message);
     return "⚠️ Gemini APIへの接続に失敗しました。";
   }
 }
 
-// --- Discord Botのイベント設定 ---
-// Botが起動し、準備完了したときに一度だけ呼ばれる
+// ===== Discord Botのイベント設定 =====
+
+// Botが正常に起動したときに一度だけ呼ばれる
 client.once("ready", () => {
   console.log(`✅ ログイン成功: ${client.user.tag}`);
 });
 
-// メッセージ受信時のイベントハンドラ
+// メッセージ受信イベント
 client.on("messageCreate", async (message) => {
-  // Bot自身のメッセージは無視
+  // Bot自身のメッセージは無視する
   if (message.author.bot) return;
 
-  // "!chat" で始まるメッセージのみ処理
+  // "!chat" で始まるメッセージだけを処理対象とする
   if (message.content.startsWith("!chat")) {
-    // "!chat"コマンド以降のテキストを抽出
+    // "!chat"コマンドの後のテキストを取り出す
     const userPrompt = message.content.slice(5).trim();
 
-    // 入力が空の場合は注意を促す
+    // ユーザーの入力が空の場合は注意を促す
     if (!userPrompt) {
       message.reply("⚠️ 何か話しかけてください（例：`!chat 今日の天気は？`）");
       return;
     }
 
-    // 「入力中」表示をチャンネルに送信
+    // 「入力中」表示をチャンネルに表示
     await message.channel.sendTyping();
 
-    // Gemini APIで返答を生成
+    // Gemini APIから返答を取得
     const reply = await generateReply(userPrompt);
 
-    // 生成した返答を返信として送信
+    // 取得した返答を返信として送信
     message.reply(reply);
   }
 });
 
-// --- DiscordへのBotログイン ---
-// .envファイルからトークンを取得してログイン
+// BotをDiscordにログイン（トークンは.envから取得）
 client.login(process.env.DISCORD_TOKEN);
