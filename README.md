@@ -70,6 +70,8 @@ PythonからJavaScript（Node.js）への切り替えにより、同様の開発
   ```bash
   npm install
   ```
+# todo
+- 環境構築自動更新Toolの導入
 
 ---
 
