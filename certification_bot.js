@@ -49,8 +49,58 @@ client.once("ready", () => {
 
 // メッセージ受信イベント
 client.on("messageCreate", async (message) => {
-  // Bot自身のメッセージは無視する
   if (message.author.bot) return;
+
+  // "!fq" コマンドで練習問題を出題
+  if (message.content.startsWith("!fq")) {
+    const fs = require('fs');
+    const path = require('path');
+    const filePath = path.join(__dirname, "fe_keywords.txt");
+    let data;
+    try {
+      data = fs.readFileSync(filePath, "utf-8");
+    } catch (err) {
+      message.reply("キーワードファイルの読み込みに失敗しました。");
+      return;
+    }
+
+    // numの範囲
+    const MIN_NUM = 1;
+    const MAX_NUM = 757;
+
+    // ランダムなnumを2つ取得
+    function getRandomNums(min, max, count) {
+      const nums = new Set();
+      while (nums.size < count) {
+        nums.add(Math.floor(Math.random() * (max - min + 1)) + min);
+      }
+      return Array.from(nums);
+    }
+    const randomNums = getRandomNums(MIN_NUM, MAX_NUM, 2);
+
+    // <s>から<e>の間でnumが一致するテキストを抽出
+    const keywordBlocks = [];
+    for (const n of randomNums) {
+      const regex = new RegExp(`num:\\s*${n}\\s*<s>([\\s\\S]*?)<e>`, "m");
+      const match = data.match(regex);
+      if (match) {
+        keywordBlocks.push(match[1].trim());
+      }
+    }
+
+    if (keywordBlocks.length === 0) {
+      message.reply("キーワードの抽出に失敗しました。");
+      return;
+    }
+
+    // Gemini APIへの指示文を作成
+    const prompt = `次のキーワード説明をもとにITパスポートや基本情報技術者試験の過去問風に練習問題を作成してください。\n\n${keywordBlocks.join("\n\n")}\n\n各キーワードごとに問題文と4択の選択肢、正解を日本語で出力してください。`;
+
+    await message.channel.sendTyping();
+    const reply = await generateReply(prompt);
+    message.reply(reply);
+    return;
+  }
 
   // "!chat" で始まるメッセージだけを処理対象とする
   if (message.content.startsWith("!chat")) {
