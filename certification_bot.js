@@ -11,9 +11,9 @@ const { GoogleGenAI } = require("@google/genai");
 // Discordクライアントの初期化
 const client = new Client({
   intents: [
-    GatewayIntentBits.Guilds,           // サーバー（ギルド）関連のイベントを受け取る
-    GatewayIntentBits.GuildMessages,    // メッセージ関連のイベントを受け取る
-    GatewayIntentBits.MessageContent,   // メッセージの中身（内容）を取得する（必要なIntent）
+    GatewayIntentBits.Guilds, // サーバー（ギルド）関連のイベントを受け取る
+    GatewayIntentBits.GuildMessages, // メッセージ関連のイベントを受け取る
+    GatewayIntentBits.MessageContent, // メッセージの中身（内容）を取得する（必要なIntent）
   ],
 });
 
@@ -53,8 +53,8 @@ client.on("messageCreate", async (message) => {
 
   // "!fq" コマンドで練習問題を出題
   if (message.content.startsWith("!fq")) {
-    const fs = require('fs');
-    const path = require('path');
+    const fs = require("fs");
+    const path = require("path");
     const filePath = path.join(__dirname, "fe_keywords.txt");
     let data;
     try {
@@ -94,7 +94,9 @@ client.on("messageCreate", async (message) => {
     }
 
     // Gemini APIへの指示文を作成
-    const prompt = `次のキーワード説明をもとにITパスポートや基本情報技術者試験の過去問風に練習問題を作成してください。\n\n${keywordBlocks.join("\n\n")}\n\n各キーワードごとに問題文と4択の選択肢、正解を日本語で出力してください。`;
+    const prompt = `次のキーワード説明をもとにITパスポートや基本情報技術者試験の過去問風に練習問題を作成してください。\n\n${keywordBlocks.join(
+      "\n\n"
+    )}\n\n各キーワードごとに問題文と4択の選択肢、正解を日本語で出力してください。`;
 
     await message.channel.sendTyping();
     const reply = await generateReply(prompt);
@@ -116,8 +118,11 @@ client.on("messageCreate", async (message) => {
     // 「入力中」表示をチャンネルに表示
     await message.channel.sendTyping();
 
+    // プロンプトの先頭に指示文を追加
+    const prompt = `order: 簡潔に答えて\n${userPrompt}`;
+
     // Gemini APIから返答を取得
-    const reply = await generateReply(userPrompt);
+    const reply = await generateReply(prompt);
 
     // 取得した返答を返信として送信
     message.reply(reply);
