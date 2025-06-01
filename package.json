@@ -1,0 +1,26 @@
+{
+  "name": "discord_bot_js-node",
+  "version": "1.0.0",
+  "description": "Discordでチャットボットを実装するためのシステムです。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/suimintoreyo/discord_bot_js-node.js.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/suimintoreyo/discord_bot_js-node.js/issues"
+  },
+  "homepage": "https://github.com/suimintoreyo/discord_bot_js-node.js#readme",
+  "dependencies": {
+    "@google/genai": "^1.3.0",
+    "axios": "^1.9.0",
+    "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0"
+  }
+}
