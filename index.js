@@ -5,8 +5,8 @@ const { Client, GatewayIntentBits } = require("discord.js");
 const dotenv = require("dotenv");
 dotenv.config(); // .envファイルを読み込んでprocess.envに設定
 
-// HTTPリクエストを送るためのaxiosを読み込み
-const axios = require("axios");
+// Google Gemini用ライブラリを読み込み
+const { GoogleGenAI } = require("@google/genai");
 
 // Discordクライアントの初期化
 const client = new Client({
@@ -21,34 +21,18 @@ const client = new Client({
 // 環境変数からAPIキーを取得（.envファイルに設定しておく）
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Gemini APIのエンドポイントURLを設定（APIキー付き）
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+// Google Geminiクライアントの初期化
+const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 // ===== Geminiとの通信関数 =====
 async function generateReply(prompt) {
   try {
-    // Gemini APIへPOSTリクエストを送信
-    const response = await axios.post(
-      GEMINI_API_URL,
-      {
-        contents: [
-          {
-            parts: [{ text: prompt }], // ユーザーからのプロンプトを渡す
-          },
-        ],
-      },
-      {
-        headers: {
-          "Content-Type": "application/json", // JSONとして送信することを指定
-        },
-      }
-    );
-
-    // Geminiの返答からテキスト部分を安全に抽出
-    const reply = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
-
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: prompt,
+    });
     // 返答が空ならメッセージを表示
-    return reply || "（Geminiからの返答が空です）";
+    return response.text || "（Geminiからの返答が空です）";
   } catch (error) {
     // エラー時のログとユーザーへのメッセージ
     console.error("Gemini APIエラー:", error.response?.data || error.message);
