@@ -73,8 +73,50 @@ PythonからJavaScript（Node.js）への切り替えにより、同様の開発
 # todo
 - 環境構築自動更新Toolの導入
 
+
 ---
 
 ## 参考文献
 
 - [discord.js公式ドキュメント](https://discord.js.org/docs/packages/discord.js/14.19.3)(https://discord.js.org/docs/packages/discord.js/14.19.3)
+
+---
+
+## このリポジトリで使用されている主なフレームワーク・言語・バージョン情報
+
+### プログラミング言語
+- **JavaScript (Node.js)**
+  - Node.js v18以降が推奨されています（README.mdの「必須環境」より）。
+
+### パッケージ管理
+- **npm**
+  - Node.jsに同梱されています。
+
+### 主な利用フレームワーク・ライブラリ
+- **discord.js**
+  - バージョン: 公式ドキュメントのリンクより【14.19.3】が推奨・参照されています。
+  - インストールコマンド例（README.md記載）:  
+    ```
+    npm install discord.js dotenv axios
+    ```
+
+- **dotenv**
+  - バージョン記載なし（一般的に最新版で問題ない）。
+
+- **axios**
+  - バージョン記載なし（一般的に最新版で問題ない）。
+
+- **@google/genai**
+  - Google Gemini用ライブラリとして利用されています（バージョン記載なし）。
+
+---
+
+### 参考
+- インストール例や実行例はREADME.mdに詳しく記載されています。
+- 依存関係のバージョン固定が必要な場合は `package.json` を参照してください（ただし、現時点の情報では個別バージョン指定の記載は見当たりません）。
+
+---
+
+#### まとめ
+- Node.js（v18以降）、discord.js（14.19.3）、dotenv、axios、@google/genai が主な構成要素です。
+- 公式ドキュメントやREADMEの指示に従ってセットアップすることで、推奨環境で動作します。
