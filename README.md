@@ -45,7 +45,7 @@ Pythonでの実装からJavaScript（Node.js）への移行を想定し、セッ
 
 2. **リポジトリをクローン**  
    ```bash
-   git clone https://github.com/suimintoreyo/discord_bot_js-node.js.git
+   git clone <repository-URL>
    cd discord_bot_js-node.js
    ```
 
